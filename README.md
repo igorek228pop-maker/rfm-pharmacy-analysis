@@ -1,3 +1,4 @@
+<img width="1920" height="1200" alt="2026-11-22_21-44-36" src="https://github.com/user-attachments/assets/bdfa3e51-d42e-4063-8111-9c4eaee8d078" />
 # RFM-анализ клиентов аптечной сети
 
 - **Стек:** SQL (PostgreSQL), Metabase, RFM- и ABC-анализ
@@ -88,7 +89,9 @@
 
 _Ссылка на публичный дашборд: https://metabase.simulative.ru/dashboard/1433-rfm-analiz?tab=545
 
-![Обзор сегментов](screenshots/page1_overview.png)
+![Обзор сегментов]<img width="1920" height="1200" alt="2026-11-22_21-44-18" src="https://github.com/user-attachments/assets/ef3e08a3-04bc-4a29-bdca-c02669db78eb" /> <img width="1920" height="1200" alt="2026-11-22_21-44-36" src="https://github.com/user-attachments/assets/d2958d36-0d56-47d8-b1dd-0fdc9bd97ff8" />
+
+
 
 ---
 
