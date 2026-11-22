@@ -1,1 +1,151 @@
+-- ======================================================================
+-- Карточка 9. Матрица R x F: число клиентов (Pivot table: строки r, столбцы f)
+-- ======================================================================
+WITH clean AS (
+    SELECT card, doc_id, datetime, summ_with_disc
+    FROM bonuscheques
+    WHERE card ~ '^\d{13}$'
+      [[AND {{dt}}]]
+),
+checks AS (
+    SELECT card, doc_id, MAX(datetime) AS dt, SUM(summ_with_disc) AS check_sum
+    FROM clean
+    GROUP BY card, doc_id
+),
+rfm AS (
+    SELECT card,
+           DATE '2022-06-10' - MAX(dt)::date AS recency,
+           COUNT(*)                          AS frequency,
+           SUM(check_sum)                    AS monetary
+    FROM checks
+    GROUP BY card
+),
+scored AS (
+    SELECT card, recency, frequency, monetary,
+           CASE WHEN recency <= 36 THEN 3 WHEN recency <= 75 THEN 2 ELSE 1 END AS r,
+           CASE WHEN frequency >= 4 THEN 3 WHEN frequency >= 2 THEN 2 ELSE 1 END AS f,
+           CASE WHEN monetary >= 2305 THEN 3 WHEN monetary >= 884 THEN 2 ELSE 1 END AS m
+    FROM rfm
+),
+segmented AS (
+    SELECT *,
+           CASE
+               WHEN r = 3 AND f = 3 AND m = 3  THEN '1. VIP'
+               WHEN f = 3 AND r >= 2           THEN '2. Лояльные'
+               WHEN r = 3 AND f = 1            THEN '3. Новички'
+               WHEN r = 3 AND f = 2            THEN '4. Растущие'
+               WHEN r = 2 AND f <= 2           THEN '5. Остывающие'
+               WHEN r = 1 AND f = 3 AND m = 3  THEN '6. Уходящие постоянные'
+               WHEN r = 1 AND m = 3            THEN '7. Уходящие с крупным чеком'
+               WHEN m = 1                      THEN '8. Спящие (M=1)'
+               ELSE                                 '9. Спящие (M=2)'
+           END AS segment
+    FROM scored
+)
+SELECT r, f, COUNT(*) AS clients
+FROM segmented
+[[WHERE segment ILIKE '%' || {{segment}} || '%']]
+GROUP BY r, f
+ORDER BY r, f;
 
+-- ======================================================================
+-- Карточка 10. Матрица R x F: средний чек (Pivot table: строки r, столбцы f)
+-- ======================================================================
+WITH clean AS (
+    SELECT card, doc_id, datetime, summ_with_disc
+    FROM bonuscheques
+    WHERE card ~ '^\d{13}$'
+      [[AND {{dt}}]]
+),
+checks AS (
+    SELECT card, doc_id, MAX(datetime) AS dt, SUM(summ_with_disc) AS check_sum
+    FROM clean
+    GROUP BY card, doc_id
+),
+rfm AS (
+    SELECT card,
+           DATE '2022-06-10' - MAX(dt)::date AS recency,
+           COUNT(*)                          AS frequency,
+           SUM(check_sum)                    AS monetary
+    FROM checks
+    GROUP BY card
+),
+scored AS (
+    SELECT card, recency, frequency, monetary,
+           CASE WHEN recency <= 36 THEN 3 WHEN recency <= 75 THEN 2 ELSE 1 END AS r,
+           CASE WHEN frequency >= 4 THEN 3 WHEN frequency >= 2 THEN 2 ELSE 1 END AS f,
+           CASE WHEN monetary >= 2305 THEN 3 WHEN monetary >= 884 THEN 2 ELSE 1 END AS m
+    FROM rfm
+),
+segmented AS (
+    SELECT *,
+           CASE
+               WHEN r = 3 AND f = 3 AND m = 3  THEN '1. VIP'
+               WHEN f = 3 AND r >= 2           THEN '2. Лояльные'
+               WHEN r = 3 AND f = 1            THEN '3. Новички'
+               WHEN r = 3 AND f = 2            THEN '4. Растущие'
+               WHEN r = 2 AND f <= 2           THEN '5. Остывающие'
+               WHEN r = 1 AND f = 3 AND m = 3  THEN '6. Уходящие постоянные'
+               WHEN r = 1 AND m = 3            THEN '7. Уходящие с крупным чеком'
+               WHEN m = 1                      THEN '8. Спящие (M=1)'
+               ELSE                                 '9. Спящие (M=2)'
+           END AS segment
+    FROM scored
+)
+SELECT r, f, ROUND(SUM(monetary) / SUM(frequency)) AS avg_check
+FROM segmented
+[[WHERE segment ILIKE '%' || {{segment}} || '%']]
+GROUP BY r, f
+ORDER BY r, f;
+
+-- ======================================================================
+-- Карточка 11. Топ-100 клиентов по выручке (Table)
+-- Номер карты замаскирован: дашборд публичный
+-- ======================================================================
+WITH clean AS (
+    SELECT card, doc_id, datetime, summ_with_disc
+    FROM bonuscheques
+    WHERE card ~ '^\d{13}$'
+      [[AND {{dt}}]]
+),
+checks AS (
+    SELECT card, doc_id, MAX(datetime) AS dt, SUM(summ_with_disc) AS check_sum
+    FROM clean
+    GROUP BY card, doc_id
+),
+rfm AS (
+    SELECT card,
+           DATE '2022-06-10' - MAX(dt)::date AS recency,
+           COUNT(*)                          AS frequency,
+           SUM(check_sum)                    AS monetary
+    FROM checks
+    GROUP BY card
+),
+scored AS (
+    SELECT card, recency, frequency, monetary,
+           CASE WHEN recency <= 36 THEN 3 WHEN recency <= 75 THEN 2 ELSE 1 END AS r,
+           CASE WHEN frequency >= 4 THEN 3 WHEN frequency >= 2 THEN 2 ELSE 1 END AS f,
+           CASE WHEN monetary >= 2305 THEN 3 WHEN monetary >= 884 THEN 2 ELSE 1 END AS m
+    FROM rfm
+),
+segmented AS (
+    SELECT *,
+           CASE
+               WHEN r = 3 AND f = 3 AND m = 3  THEN '1. VIP'
+               WHEN f = 3 AND r >= 2           THEN '2. Лояльные'
+               WHEN r = 3 AND f = 1            THEN '3. Новички'
+               WHEN r = 3 AND f = 2            THEN '4. Растущие'
+               WHEN r = 2 AND f <= 2           THEN '5. Остывающие'
+               WHEN r = 1 AND f = 3 AND m = 3  THEN '6. Уходящие постоянные'
+               WHEN r = 1 AND m = 3            THEN '7. Уходящие с крупным чеком'
+               WHEN m = 1                      THEN '8. Спящие (M=1)'
+               ELSE                                 '9. Спящие (M=2)'
+           END AS segment
+    FROM scored
+)
+SELECT LEFT(card, 4) || '******' || RIGHT(card, 3) AS card_masked,
+       segment, recency, frequency, ROUND(monetary) AS monetary
+FROM segmented
+[[WHERE segment ILIKE '%' || {{segment}} || '%']]
+ORDER BY monetary DESC
+LIMIT 100;
