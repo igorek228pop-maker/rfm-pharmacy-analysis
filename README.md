@@ -89,9 +89,9 @@
 
 _Ссылка на публичный дашборд: https://metabase.simulative.ru/dashboard/1433-rfm-analiz?tab=545
 
-[Metabase - RFM-анализ .pdf](https://github.com/user-attachments/files/35239994/Metabase.-.RFM-.pdf)
-[Metabase - RFM-анализ  (1).pdf](https://github.com/user-attachments/files/35240007/Metabase.-.RFM-.1.pdf)
+<img width="1317" height="862" alt="2026-11-22_23-06-42" src="https://github.com/user-attachments/assets/d64a60ca-0895-4bb1-a608-64966812fb6c" />
 
+<img width="1325" height="865" alt="2026-11-22_23-05-44" src="https://github.com/user-attachments/assets/cbca4b38-37bc-43ce-b485-2a7123c6d28a" />
 
 ---
 
