@@ -86,7 +86,7 @@
 
 Дашборд в Metabase (фильтр по дате на каждом графике):
 
-_Ссылка на публичный дашборд: добавить после публикации._
+_Ссылка на публичный дашборд: https://metabase.simulative.ru/dashboard/1433-rfm-analiz?tab=545
 
 ![Обзор сегментов](screenshots/page1_overview.png)
 
